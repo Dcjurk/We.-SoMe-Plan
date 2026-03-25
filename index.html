@@ -338,7 +338,7 @@ function Modal({post,onSave,onDelete,onClose,team,saving}){
 }
 
 // ── App ───────────────────────────────────────────────────────
-export default function App(){
+function App(){
   const [posts,setPosts]=useState([]);
   const [team,setTeam]=useState(DEFAULT_TEAM);
   const [view,setView]=useState("week");
