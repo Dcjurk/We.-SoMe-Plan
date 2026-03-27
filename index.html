@@ -97,6 +97,28 @@ function fromDb(row) {
   };
 }
 
+function eventToDb(e) {
+  return {
+    id: e.id,
+    name: e.name,
+    type: e.type,
+    date_start: e.dateStart,
+    date_end: e.dateEnd,
+    persons: e.persons || []
+  };
+}
+
+function eventFromDb(r) {
+  return {
+    id: r.id,
+    name: r.name,
+    type: r.type,
+    dateStart: r.date_start,
+    dateEnd: r.date_end,
+    persons: r.persons || []
+  };
+}  
+  
 function getMonday(d){const dt=new Date(d),day=dt.getDay(),diff=dt.getDate()-day+(day===0?-6:1);return new Date(dt.setDate(diff));}
 function getWeekDays(mon){return Array.from({length:7},(_,i)=>{const d=new Date(mon);d.setDate(d.getDate()+i);return d;});}
 function fmtISO(d){return d.toISOString().split("T")[0];}
@@ -208,7 +230,7 @@ function DayCell({day,posts,onClick,onDragStart,onDrop,compact,isToday,addPost})
   );
 }
 
-function TeamModal({team,onSave,onClose}){
+ TeamModal({team,onSave,onClose}){
   const [members,setMembers]=useState([...team]);
   const [newName,setNewName]=useState("");
   const add=()=>{const n=newName.trim();if(!n||members.includes(n))return;setMembers(m=>[...m,n]);setNewName("");};
@@ -253,7 +275,7 @@ function TeamModal({team,onSave,onClose}){
   );
 }
 
-function Modal({post,onSave,onDelete,onClose,team}){
+ Modal({post,onSave,onDelete,onClose,team}){
   const isNew=!post.id;
   const initPersons=Array.isArray(post.persons)?post.persons:[team[0]];
   const [f,setF]=useState({
@@ -339,8 +361,10 @@ const navBtn={background:C.plumLight,border:`1px solid ${C.plumMid}`,borderRadiu
   padding:"6px 14px",fontSize:13,cursor:"pointer",color:C.plum1,fontWeight:500,fontFamily:"inherit"};
 const td={padding:"11px 15px",verticalAlign:"middle"};
 
-function App(){
+ App(){
   const [posts,setPosts]=useState([]);
+  const [events,setEvents] = useState([]);
+  const [eventModal,setEventModal] = useState(null);
   const [team,setTeam]=useState(DEFAULT_TEAM);
   const [view,setView]=useState("week");
   const [mon,setMon]=useState(getMonday(new Date()));
@@ -360,6 +384,10 @@ function App(){
       if(pe)setError("Fehler beim Laden der Posts: "+pe.message);
       else setPosts((postData||[]).map(fromDb));
 
+      const {data:ed,error:ee}=await db.from("events").select("*").order("date_start");
+      if(ee) setError("Events: "+ee.message); 
+      else setEvents((ed||[]).map(eventFromDb));
+      
       // Team laden
       const {data:teamData,error:te}=await db.from("team_members").select("name").order("id");
       if(!te&&teamData&&teamData.length>0)setTeam(teamData.map(r=>r.name));
@@ -382,7 +410,7 @@ function App(){
     }
     setModal(null);
   };
-
+   
   const deletePost=async(id)=>{
     const {error:e}=await db.from("posts").delete().eq("id",id);
     if(e){setError("Fehler beim Löschen: "+e.message);return;}
@@ -390,6 +418,29 @@ function App(){
     setModal(null);
   };
 
+  const handleSaveEvent=async event=>{
+    setSaving(true);
+    const {error:e}=await db.from("events").upsert(eventToDb(event));
+    if(e) setError(e.message);
+    else {
+    const ex=events.find(ev=>ev.id===event.id);
+    setEvents(ex?events.map(ev=>ev.id===event.id?event:ev):[...events,event]);
+    setEventModal(null);
+  }
+  setSaving(false);
+};
+
+  const handleDeleteEvent=async id=>{
+    setSaving(true);
+    const {error:e}=await db.from("events").delete().eq("id",id);
+    if(e) setError(e.message);
+    else {
+    setEvents(events.filter(ev=>ev.id!==id));
+    setEventModal(null);
+  }
+  setSaving(false);
+};
+   
   const saveTeam=async(members)=>{
     await db.from("team_members").delete().neq("id",0);
     const rows=members.map(name=>({name}));
@@ -474,7 +525,7 @@ function App(){
             <button onClick={()=>setModal({})} style={{background:C.aqua,color:C.white,border:"none",
               borderRadius:8,padding:"7px 16px",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit",
               boxShadow:"0 2px 8px rgba(22,125,131,0.35)"}}>
-              + Neuer Post
+              + Neuer Post <button onClick={()=>setEventModal({})}>+ Event</button>
             </button>
           </div>
         </div>
@@ -578,6 +629,15 @@ function App(){
 
       {teamModal&&<TeamModal team={team} onSave={saveTeam} onClose={()=>setTeamModal(false)}/>}
       {modal!==null&&<Modal post={modal} onSave={savePost} onDelete={deletePost} onClose={()=>setModal(null)} team={team}/>}
+      {eventModal!==null && (
+      <EventModal
+      event={eventModal}
+      onSave={handleSaveEvent}
+      onDelete={handleDeleteEvent}
+      onClose={()=>setEventModal(null)}
+      saving={saving}
+  />
+)}
     </div>
   );
 }
