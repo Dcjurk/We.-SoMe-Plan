@@ -230,7 +230,7 @@ function DayCell({day,posts,onClick,onDragStart,onDrop,compact,isToday,addPost})
   );
 }
 
- TeamModal({team,onSave,onClose}){
+ function TeamModal({team,onSave,onClose}){
   const [members,setMembers]=useState([...team]);
   const [newName,setNewName]=useState("");
   const add=()=>{const n=newName.trim();if(!n||members.includes(n))return;setMembers(m=>[...m,n]);setNewName("");};
