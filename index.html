@@ -96,7 +96,7 @@ const CARD_BG = {
 // ── Helpers ───────────────────────────────────────────────────
 function getMonday(d){const dt=new Date(d),day=dt.getDay(),diff=dt.getDate()-day+(day===0?-6:1);return new Date(dt.setDate(diff));}
 function getWeekDays(mon){return Array.from({length:7},(_,i)=>{const d=new Date(mon);d.setDate(d.getDate()+i);return d;});}
-function fmtISO(d){return d.toISOString().split("T")[0];}
+function fmtISO(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
 function fmtDE(s){return new Date(s+"T12:00:00").toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"});}
 function getMonthDays(year,month){
   const first=new Date(year,month,1),offset=(first.getDay()+6)%7,dim=new Date(year,month+1,0).getDate(),cells=[];
