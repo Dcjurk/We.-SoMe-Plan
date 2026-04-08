@@ -54,13 +54,13 @@ const C = {
 const DEFAULT_TEAM  = ["Dominic","Theresa","Nicola","Milena"];
 const STATUS_POST   = ["Geplant","Eingestellt","Gepostet","Reportet"];
 const STATUS_COPY   = ["In Arbeit","In Freigabe","Freigegeben"];
-const STATUS_VISUAL = ["Gebrieft","In Erstellung","In Freigabe","Freigegeben","Canva"];
+const STATUS_VISUAL = ["Gebrieft","In Erstellung","In Freigabe","Freigegeben","Canva","Repost"];
 const PLATFORMS     = ["LinkedIn","Instagram","Beide"];
 const DAYS_SHORT    = ["Mo","Di","Mi","Do","Fr","Sa","So"];
 const MONTHS_DE     = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
 // ── NEW: Event type constants ─────────────────────────────────
-const EVENT_TYPES = ["Webinar","Messe","Preisverleihung","Konferenz"];
-const EVENT_ICONS = { "Webinar":"🎙️","Messe":"🏛️","Preisverleihung":"🏆","Konferenz":"🎤" };
+const EVENT_TYPES = ["Webinar","Messe","Preisverleihung","Konferenz","Feiertag"];
+const EVENT_ICONS = { "Webinar":"🎙️","Messe":"🏛️","Preisverleihung":"🏆","Konferenz":"🎤","Feiertag":"🎉" };
 
 const SP = {
   "Geplant":     { bg:C.plumLight,   text:C.plum2,    border:C.plumMid },
@@ -79,6 +79,7 @@ const SV = {
   "In Freigabe":   { bg:"#fff3e8",   text:"#b84f0a",  border:"#f5c89a" },
   "Freigegeben":   { bg:C.aquaLight, text:C.aquaDark, border:"#9fd0d3" },
   "Canva":         { bg:"#fdf0ff",   text:"#9b30c0",  border:"#e0b0f5" },
+  "Repost":        { bg:"#fdf0ff",   text:"#9b30c0",  border:"#e0b0f5" },
 };
 const PL = {
   "LinkedIn":  { bg:"#e8f1f8", text:"#0077b5",     border:"#aecde8" },
